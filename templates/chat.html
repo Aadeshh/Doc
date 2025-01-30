@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Doc</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        body {
+            background: #E8EBF5;
+            padding: 0;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .chat-box {
+            height: 600px;
+            width: 400px;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            right: 20px;
+            bottom: 20px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            visibility: hidden;
+            overflow: hidden;
+        }
+
+        .chat-box-header {
+            padding: 20px;
+            background: #2C50EF;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-box-header h3 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .chat-box-header p {
+            cursor: pointer;
+            margin: 0;
+            padding: 5px;
+        }
+
+        .chat-box-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .chat-message {
+            margin-bottom: 16px;
+            max-width: 80%;
+            clear: both;
+        }
+
+        .chat-box-body-send {
+            float: right;
+            background: #2C50EF;
+            color: white;
+            padding: 12px 16px;
+            border-radius: 12px 12px 0 12px;
+        }
+
+        .chat-box-body-receive {
+            float: left;
+            background: white;
+            color: #1a1a1a;
+            padding: 12px 16px;
+            border-radius: 12px 12px 12px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-text {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message-time {
+            font-size: 11px;
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+
+        .chat-box-footer {
+            padding: 16px;
+            background: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-box-footer input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .chat-box-footer input:focus {
+            border-color: #2C50EF;
+        }
+
+        .chat-box-footer .send {
+            color: #2C50EF;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .chat-box-footer .send:hover {
+            background-color: #f0f2ff;
+        }
+
+        .chat-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2C50EF;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 100px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(44, 80, 239, 0.3);
+            transition: transform 0.2s;
+        }
+
+        .chat-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .chat-button::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: #47cf73;
+            border-radius: 50%;
+        }
+
+        /* Custom scrollbar */
+        .chat-box-body::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-box-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-box-body::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        @media screen and (max-width: 450px) {
+            .chat-box {
+                width: 100%;
+                height: 100%;
+                right: 0;
+                bottom: 0;
+                border-radius: 0;
+            }
+            
+            .chat-button {
+                right: 10px;
+                bottom: 10px;
+            }
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="chat-box">
+        <div class="chat-box-header">
+            <h3>Doc</h3>
+            <p><i class="fa fa-times"></i></p>
+        </div>
+        <div class="chat-box-body" id="chatBody">
+            <div class="chat-message">
+                <div class="chat-box-body-receive">
+                    <p class="message-text">Hey! I'm your AI medical assistant, How can I help you today?</p>
+                    <div class="message-time">Doc</div>
+                </div>
+            </div>
+        </div>
+        <div class="chat-box-footer">
+            <input id="userInput" placeholder="Type your message..." type="text" />
+            <i class="send far fa-paper-plane"></i>
+        </div>
+    </div>
+    <div class="chat-button">
+        <span>Message Us</span>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Show/hide chat box
+            $(".chat-button").click(function() {
+                $(".chat-box").css("visibility", "visible");
+                $(this).hide();
+            });
+
+            $(".fa-times").click(function() {
+                $(".chat-box").css("visibility", "hidden");
+                $(".chat-button").show();
+            });
+
+            function getCurrentTime() {
+                return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+
+            function addMessage(message, isUser = false) {
+                const messageHTML = `
+                    <div class="chat-message">
+                        <div class="chat-box-body-${isUser ? 'send' : 'receive'}">
+                            <p class="message-text">${message}</p>
+                            <div class="message-time">${isUser ? 'You' : 'Bot'} • ${getCurrentTime()}</div>
+                        </div>
+                    </div>
+                `;
+                $("#chatBody").append(messageHTML);
+                $("#chatBody").scrollTop($("#chatBody")[0].scrollHeight);
+            }
+
+            function sendMessage() {
+                const userInput = $("#userInput");
+                const message = userInput.val().trim();
+                
+                if (message) {
+                    addMessage(message, true);
+                    userInput.val('');
+
+                    // Send to backend
+                    $.ajax({
+                        url: "/get",
+                        type: "POST",
+                        data: { msg: message },
+                        success: function(response) {
+                            addMessage(response);
+                        },
+                        error: function() {
+                            addMessage("I apologize, but I'm having trouble connecting. Please try again.");
+                        }
+                    });
+                }
+            }
+
+            // Send message on button click
+            $(".send").click(sendMessage);
+
+            // Send message on Enter key
+            $("#userInput").keypress(function(e) {
+                if (e.which == 13) {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
